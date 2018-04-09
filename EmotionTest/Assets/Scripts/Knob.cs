@@ -26,6 +26,9 @@ public class Knob : MonoBehaviour {
 
     private string filePath = "Recording.txt";
 
+	private bool left_lock=false;
+	private bool right_lock = false;
+
     private void Start()
     {
         filePath = Application.persistentDataPath + "/Recording.txt";
@@ -104,6 +107,7 @@ public class Knob : MonoBehaviour {
     */
     void Record()
     {
+		Debug.Log (transform.eulerAngles.z);
         if (last_record > 280 && transform.eulerAngles.z < 80)
             value_level--;
         if (last_record < 80 && transform.eulerAngles.z > 280)
@@ -116,7 +120,7 @@ public class Knob : MonoBehaviour {
         string newtext = record_time.ToString() + "," + new_value.ToString() + "\n";
         File.AppendAllText(filePath, newtext);
         last_record = transform.eulerAngles.z;
-       Debug.Log(value_level);
+       //Debug.Log(value_level);
     }
     void Update()
     {
@@ -129,6 +133,37 @@ public class Knob : MonoBehaviour {
             rotation_z -= start_angle;
            
             transform.rotation = Quaternion.Euler(0f, 0f, rotation_z+ current_angle);
+
+			if (left_lock) {
+				if (transform.eulerAngles.z < 120f) {
+					left_lock = false;
+				} else {
+					
+					transform.rotation = Quaternion.Euler(0f, 0f, 120f);
+					return;
+				}
+			}
+
+			if (right_lock) {
+				if (transform.eulerAngles.z>240f) {
+					right_lock = false;
+				} else {
+					
+					transform.rotation = Quaternion.Euler(0f, 0f, 240f);
+					return;
+					
+				}
+			}
+
+			if (transform.eulerAngles.z<180f&&transform.eulerAngles.z>120f) {
+				transform.rotation = Quaternion.Euler(0f, 0f, 120f);
+				left_lock = true;
+			}
+
+			if (transform.eulerAngles.z<240f&&transform.eulerAngles.z>180f) {
+				transform.rotation = Quaternion.Euler(0f, 0f, 240f);
+				right_lock = true;
+			}
             
         }
 
